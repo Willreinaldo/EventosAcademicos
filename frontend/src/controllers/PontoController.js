@@ -3,7 +3,9 @@ const Ponto = require('../models/ponto');
 const addPonto = async (request, response) =>{
 
     const nome = request.body.nome;
-    const geometria = {type: 'Point', coordinates:[request.body.lng, request.body.lat]}
+    const lat = request.body.lat;
+    const lng = request.body.lng;
+    const geometria = {type: 'Point', coordinates:[lng, lat]};
 
     console.log(geometria);
 

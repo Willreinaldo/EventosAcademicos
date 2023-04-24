@@ -1,0 +1,9 @@
+.formulario-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30%;
+    height: 80%;
+    background-color: white;
+    z-index: 1;
+  }
