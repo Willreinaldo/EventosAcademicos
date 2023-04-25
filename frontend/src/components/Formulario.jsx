@@ -11,10 +11,10 @@ const Formulario = ({ markerPosition, localizacao }) => {
       lat: markerPosition.lat,
       lng: markerPosition.lng,
       descricao: descricao,
-      localizacao: localizacao,
+      localizacao: localizacao
     };
 
-    fetch("http://localhost:3000/pontos", {
+    fetch("http://localhost:4000/pontos", {
       method: "POST",
       headers: {
         Accept: "application/json",

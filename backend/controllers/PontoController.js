@@ -9,9 +9,9 @@ const addPonto = async (request, response) =>{
 
     const geometria = {type: 'Point', coordinates:[lng, lat]};
 
-    console.log(geometria);
 
     const ponto = Ponto.build({nome, descricao, geometria});
+    console.log(ponto);
     ponto.save().then(()=>{
         response.status(200).send('Ponto salvo!');
     }).catch(err =>{
@@ -25,9 +25,10 @@ const getPontos = async (request, response) =>{
     response.status(200).send(pontos);
 }
 
-const sincronizar = async(request, response) =>{
+const sincronizar = async () =>{
     await Ponto.sync();
-    response.status(200).send('Sincronizado');
+    console.log('Sincronizado');
 };
+
 
 module.exports = {addPonto, sincronizar, getPontos};
