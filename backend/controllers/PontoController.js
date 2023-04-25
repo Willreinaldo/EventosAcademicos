@@ -1,14 +1,17 @@
- 
-const addPonto = async (request, response) =>{
+const Ponto = require('../models/ponto'); 
 
+const addPonto = async (request, response) =>{
+    console.log(request);
     const nome = request.body.nome;
-    const lat = request.body.lat;
-    const lng = request.body.lng;
+    const descricao = request.body.descricao;
+    const localizacao = request.body.localizacao;
+    const [lng, lat] = localizacao.split(',').map(parseFloat);
+
     const geometria = {type: 'Point', coordinates:[lng, lat]};
 
     console.log(geometria);
 
-    const ponto = Ponto.build({nome, geometria});
+    const ponto = Ponto.build({nome, descricao, geometria});
     ponto.save().then(()=>{
         response.status(200).send('Ponto salvo!');
     }).catch(err =>{
