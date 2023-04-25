@@ -1,5 +1,4 @@
-const Ponto = require('../models/ponto');
-
+ 
 const addPonto = async (request, response) =>{
 
     const nome = request.body.nome;
