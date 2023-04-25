@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate  } from "react-router-dom"; // Importe o useHistory do React Router
+
 
 const Formulario = ({ markerPosition, localizacao }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
+  const navigate  = useNavigate (); // Inicialize o useHistory
+
+  const handleVerEventos = () => {
+    navigate("/eventos"); // Chame navigate com a rota "/eventos"
+  };
 
   const salvar = async () => {
     console.log(localizacao);
@@ -72,6 +79,9 @@ const Formulario = ({ markerPosition, localizacao }) => {
         <br />
         <button type="button" onClick={salvar}>
           Salvar
+        </button>
+        <button type="button"  onClick={handleVerEventos}>
+          Ver eventos
         </button>
       </form>
     </div>
