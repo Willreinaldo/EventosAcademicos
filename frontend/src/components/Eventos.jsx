@@ -22,19 +22,45 @@ const Eventos = () => {
 
   return (
     <div>
-      <h1>Lista de Eventos</h1>
-      <Link to="/">
-        <button>Voltar</button>
-      </Link>
-      <ul>
+      <h1 className="title is-1">Lista de Eventos</h1>
+      <div className="mb-3">
+        <Link to="/" className="button is-link is-light">
+          Voltar
+        </Link>
+      </div>
+
+      <div className="columns is-multiline">
         {eventos.map((evento) => (
-          <li key={evento.id}>
-            <h2>{evento.nome}</h2>
-            <p>{evento.descricao}</p>
-            <p>Latitude: {evento.localizacao.latitude}, Longitude: {evento.localizacao.longitude}</p>
-          </li>
+          <div key={evento.id} className="column is-one-third">
+            <div className="card">
+              <div className="card-content">
+                <h2 className="title is-4">{evento.nome}</h2>
+                <p>{evento.descricao}</p>
+                <p className="is-size-7" style={{ display: "flex" }}>
+                  <strong style={{ marginRight: "5px" }}>Latitude:</strong>
+                  <input
+                    type="text"
+                    value={evento.localizacao.latitude}
+                    className="input is-static is-size-7"
+                    disabled
+                    style={{ backgroundColor: "lightgray" }}
+                  />
+                  <strong style={{ marginLeft: "10px", marginRight: "5px" }}>
+                    Longitude:
+                  </strong>
+                  <input
+                    type="text"
+                    value={evento.localizacao.longitude}
+                    className="input is-static is-size-7"
+                    disabled
+                    style={{ backgroundColor: "lightgray" }}
+                  />
+                </p>
+              </div>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

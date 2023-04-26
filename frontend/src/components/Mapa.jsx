@@ -11,6 +11,11 @@ const Mapa = (props) => {
   });
   const [localizacao, setLocalizacao] = useState(`${markerPosition.lat}, ${markerPosition.lng}`);
 
+  
+  const onMapClick = (mapProps, map, clickEvent) => {
+    setLocalizacao(`${clickEvent.latLng.lat()}, ${clickEvent.latLng.lng()}`);
+    setMarkerPosition(clickEvent.latLng);
+  };
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -22,10 +27,8 @@ const Mapa = (props) => {
             lng: -38.558930105104125,
           }}
           zoom={14}
-          onClick={(t, map, coord) => {
-            setLocalizacao(`${coord.latLng.lat()}, ${coord.latLng.lng()}`);
-             setMarkerPosition(coord);
-          }}
+          onClick={onMapClick}
+
         >
           <Marker
             position={markerPosition}
