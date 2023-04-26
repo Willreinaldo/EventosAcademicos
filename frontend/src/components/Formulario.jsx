@@ -79,17 +79,17 @@ const Formulario = ({ markerPosition, localizacao }) => {
           </div>
         </div>
 
-        <div className="field">
+        <div className="field  is-size-7">
           <label htmlFor="localizacao" className="label">
             Localização do Evento:
           </label>
-          <div className="control">
+          <div className="control ">
             <input
               type="text"
               id="localizacao"
               name="localizacao"
               value={localizacao}
-              className="input "
+              className="input is-size-7"
               disabled
             />
           </div>

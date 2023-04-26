@@ -36,26 +36,25 @@ const Eventos = () => {
               <div className="card-content">
                 <h2 className="title is-4">{evento.nome}</h2>
                 <p>{evento.descricao}</p>
-                <p className="is-size-7" style={{ display: "flex" }}>
-                  <strong style={{ marginRight: "5px" }}>Latitude:</strong>
-                  <input
-                    type="text"
-                    value={evento.localizacao.latitude}
-                    className="input is-static is-size-7"
-                    disabled
-                    style={{ backgroundColor: "lightgray" }}
-                  />
-                  <strong style={{ marginLeft: "10px", marginRight: "5px" }}>
-                    Longitude:
-                  </strong>
-                  <input
-                    type="text"
-                    value={evento.localizacao.longitude}
-                    className="input is-static is-size-7"
-                    disabled
-                    style={{ backgroundColor: "lightgray" }}
-                  />
-                </p>
+                <div className="field is-size-7">
+                  <label htmlFor="localizacao" className="label">
+                    Localização do Evento:
+                  </label>
+                  <div className="control">
+                    <input
+                      type="text"
+                      id="localizacao"
+                      name="localizacao"
+                      value={JSON.stringify(evento.localizacao)
+                        .replace(/[{}"]/g, '') // remove os caracteres {, }, "
+                        .replace(/-/g, '')     // remove o caractere -
+                        .replace(/,/g, ', ')    // adiciona um espaço após a vírgula
+                      }
+                      className="input is-size-7"
+                      disabled
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
