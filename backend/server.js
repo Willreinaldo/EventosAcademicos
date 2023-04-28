@@ -1,22 +1,21 @@
-// Importar os módulos necessários
-const express = require('express');
-const {addPonto, getPontos, sincronizar} = require('../backend/controllers/PontoController.js');
+ const express = require('express');
+const {addPonto, getPontos, sincronizar, atualizarPonto, buscarPonto, deletarPonto} = require('../backend/controllers/PontoController.js');
 const cors = require('cors');
 
-// Criar a aplicação
-const app = express();
+ const app = express();
 
-// Configurar o CORS
-app.use(cors());
+ app.use(cors());
 
-// Configurar o JSON como formato de requisição
-app.use(express.json());
+ app.use(express.json());
 
 // Chama a função de sincronização antes de iniciar o servidor
 sincronizar().catch(err => console.error(err));
 
 // Definir as rotas
 app.post('/pontos', addPonto);
+app.get('/pontos/:id', buscarPonto);
+app.put('/pontos/:id',atualizarPonto);
+app.delete('/pontos/:id',deletarPonto);
 app.get('/pontos',  getPontos);
 
 

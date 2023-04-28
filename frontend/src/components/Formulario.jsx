@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Importe o useHistory do React Router
-import "bulma/css/bulma.css"; // Importe o arquivo CSS do Bulma
+import { useNavigate } from "react-router-dom";  
+import EditarEvento from "./EditarEvento";
+import "bulma/css/bulma.css";  
 
 const Formulario = ({ markerPosition, localizacao }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const navigate = useNavigate(); // Inicialize o useHistory
+  const navigate = useNavigate();  
 
   const handleVerEventos = () => {
-    navigate("/eventos"); // Chame navigate com a rota "/eventos"
+    navigate("/eventos");  
   };
 
   const salvar = async () => {
@@ -16,7 +17,6 @@ const Formulario = ({ markerPosition, localizacao }) => {
       alert("Nome não pode ser vazio.");
       return;
     }
-    console.log(localizacao);
     const obj = {
       nome: nome,
       lat: markerPosition.lat,
@@ -117,9 +117,3 @@ const Formulario = ({ markerPosition, localizacao }) => {
 };
 
 export default Formulario;
-
-
-
-
-
-

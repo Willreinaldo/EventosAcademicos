@@ -4,6 +4,11 @@ import { Link } from "react-router-dom";
 const Eventos = () => {
   const [eventos, setEventos] = useState([]);
 
+  const verNoMapa = (localizacao) => {
+    const { latitude, longitude } = localizacao;
+    const url = `https://www.google.com/maps/place/${longitude},${latitude}`;
+    window.open(url, "_blank");
+  };
   useEffect(() => {
     fetch("http://localhost:4000/pontos")
       .then((response) => response.json())
@@ -19,7 +24,16 @@ const Eventos = () => {
       })
       .catch((error) => console.error(error));
   }, []);
-
+  
+  const handleDelete = (id) => {
+    fetch(`http://localhost:4000/pontos/${id}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setEventos(eventos.filter((evento) => evento.id !== id));
+      })
+      .catch((error) => console.error(error));
+  };
   return (
     <div>
       <h1 className="title is-1">Lista de Eventos</h1>
@@ -53,6 +67,37 @@ const Eventos = () => {
                       className="input is-size-7"
                       disabled
                     />
+                    <div className="column is-narrow">
+                      <button
+                        className="button is-small"
+                        onClick={() => verNoMapa(evento.localizacao)}
+                      >
+                        <span className="icon">
+                          <i className="fas fa-map-marker-alt"></i>
+                        </span>
+                        Ver no mapa
+                      </button>
+                    </div>
+                    <div className="column is-narrow">
+                      <Link
+                        className="button is-small"
+                        to={`/eventos/${evento.id}`}
+                      >
+                        <span className="icon">
+                          <i className="fas fa-edit"></i>
+                        </span>
+                        Editar
+                      </Link>
+                      <button
+                        className="button is-small is-danger"
+                        onClick={() => handleDelete(evento.id)}
+                      >
+                        <span className="icon">
+                          <i className="fas fa-trash-alt"></i>
+                        </span>
+                        Deletar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
