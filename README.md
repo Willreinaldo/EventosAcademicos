@@ -38,9 +38,10 @@ Execute o comando npm run start para iniciar o servidor backend. O servidor ser�
 * Após seguir os passos de configuração, abra seu navegador e acesse a URL  <a>http://localhost:3000</a> para utilizar a aplicação.
 
 * A aplicação apresenta uma página com um mapa do Google Maps e um formulário para adicionar eventos. Ao adicionar um evento, ele será salvo no banco de dados com base na sua localização geográfica.
-* Na página de eventos é possivel editar cada evento (nome e descrição) além do botão de deletar o evento que o usuário desejar. 
 * Ao clicar no botão <strong>"Ver Eventos"</strong>, você será redirecionado para outra página que lista todos os eventos salvos no banco de dados.
 * Além de sua funcionalidade principal, essa aplicação oferece uma funcionalidade extra aos usuários: na página de visualização de eventos, é possível localizá-los no mapa do Google Maps com base nas coordenadas armazenadas no banco de dados.
+* Na página de eventos é possivel editar cada evento (nome e descrição) além do botão de deletar o evento que o usuário desejar. 
+
 ## Observações
 * Este projeto não utiliza a KEY da API do Google Maps e nem o Docker Compose.
 * Este projeto requer a criação de um arquivo .env para definir as variáveis de ambiente necessárias.
