@@ -1,5 +1,5 @@
 # Persistência de Eventos por Localização
-Este projeto é responsável por persistir eventos em um banco de dados com base na sua localização geográfica e listar esses eventos em outra página.
+Este projeto é responsável por persistir eventos em um banco de dados com base na sua localização geográfica e listar esses eventos em outra página, além de editar e excluir o evento.
 
 O projeto utiliza React e Bulma.css no frontend, Express.js e a API do Google Maps no backend, e Postgres, PGAdmin, Sequelize e Postgis no banco de dados. O projeto pode ser executado com ou sem o Docker.
 
