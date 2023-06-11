@@ -9,6 +9,14 @@ const pontoSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  dataInicio: {
+    type: Date,
+    required: true,
+  },
+  dataTermino: {
+    type: Date,
+    required: true,
+  },
   geometria: {
     type: {
       type: String,
@@ -16,12 +24,12 @@ const pontoSchema = new mongoose.Schema({
       required: true,
     },
     coordinates: {
-      type: [Number],
+      type: [String],
       required: true,
     },
   },
 });
 
-const Ponto = mongoose.model('Ponto', pontoSchema);
+const Ponto = mongoose.model('Ponto', pontoSchema,'EventosAcademicos');
 
 module.exports = Ponto;

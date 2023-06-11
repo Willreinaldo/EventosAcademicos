@@ -1,5 +1,6 @@
- const express = require('express');
-const {addPonto, getPontos, sincronizar, atualizarPonto, buscarPonto, deletarPonto} = require('../backend/controllers/PontoController.js');
+const express = require('express');
+const mongoose = require('../backend/database/database');
+const {addPonto, getPontos, atualizarPonto, buscarPonto, deletarPonto} = require('../backend/controllers/PontoController.js');
 const cors = require('cors');
 
  const app = express();
@@ -8,8 +9,9 @@ const cors = require('cors');
 
  app.use(express.json());
 
-// Chama a função de sincronização antes de iniciar o servidor
-sincronizar().catch(err => console.error(err));
+ mongoose.connection.on('connected', () => {
+  console.log('Conexão com o MongoDB estabelecida com sucesso!');
+});
 
 // Definir as rotas
 app.post('/pontos', addPonto);

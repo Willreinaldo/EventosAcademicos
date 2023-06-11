@@ -2,12 +2,12 @@ const Ponto = require('../models/ponto');
 
 const addPonto = async (request, response) => {
   console.log(request.body);
-  const { nome, descricao, localizacao } = request.body;
-  const [lng, lat] = localizacao.split(',').map(parseFloat);
+const { nome, descricao, localizacao, dataInicio, dataTermino } = request.body;
+const [lng, lat] = localizacao.split(',').map(parseFloat);
 
-  const geometria = { type: 'Point', coordinates: [lng, lat] };
+const geometria = { type: 'Point', coordinates: [lng, lat] };
 
-  const ponto = new Ponto({ nome, descricao, geometria });
+const ponto = new Ponto({ nome, descricao, dataInicio, dataTermino, geometria });
   console.log(ponto);
   try {
     await ponto.save();
@@ -72,4 +72,4 @@ const atualizarPonto = async (request, response) => {
   }
 };
 
-module.exports = { addPonto, sincronizar, getPontos, buscarPonto, atualizarPonto, deletarPonto };
+module.exports = { addPonto, getPontos, buscarPonto, atualizarPonto, deletarPonto };

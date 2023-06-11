@@ -1,28 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";  
+import { useNavigate } from "react-router-dom";
 import EditarEvento from "./EditarEvento";
-import "bulma/css/bulma.css";  
+import "bulma/css/bulma.css";
 
 const Formulario = ({ markerPosition, localizacao }) => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const navigate = useNavigate();  
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataTermino, setDataTermino] = useState("");
+  const navigate = useNavigate();
 
   const handleVerEventos = () => {
-    navigate("/eventos");  
+    navigate("/eventos");
   };
 
+  useEffect(() => {
+    console.log("datas: ",dataInicio,dataTermino); 
+  }, []);
+
   const salvar = async () => {
+    console.log("datas salvar: ",dataInicio,dataTermino); 
     if (!nome) {
       alert("Nome não pode ser vazio.");
       return;
     }
     const obj = {
       nome: nome,
-      lat: markerPosition.lat,
-      lng: markerPosition.lng,
       descricao: descricao,
+      dataInicio: dataInicio,
+      dataTermino: dataTermino,
       localizacao: localizacao,
+      geometria: {
+        type: 'Point',
+        coordinates: [markerPosition.lng, markerPosition.lat],
+      },
     };
 
     fetch("http://localhost:4000/pontos", {
@@ -74,7 +85,7 @@ const Formulario = ({ markerPosition, localizacao }) => {
               name="descricao"
               value={descricao}
               onChange={(event) => setDescricao(event.target.value)}
-              className="textarea"
+              className="textarea is-small"
             ></textarea>
           </div>
         </div>
@@ -94,6 +105,39 @@ const Formulario = ({ markerPosition, localizacao }) => {
             />
           </div>
         </div>
+
+        <div> 
+        <label htmlFor="dataInicio" className="label">
+          Data de Início:
+        </label>
+        <div className="control">
+          <input
+            type="date"
+            id="dataInicio"
+            name="dataInicio"
+            value={dataInicio}
+            onChange={(event) => setDataInicio(event.target.value)}
+            className="input"
+            required
+          />
+        </div>
+
+        <label htmlFor="dataTermino" className="label">
+          Data de Término:
+        </label>
+        <div className="control">
+          <input
+            type="date"
+            id="dataTermino"
+            name="dataTermino"
+            value={dataTermino}
+            onChange={(event) => setDataTermino(event.target.value)}
+            className="input"
+            required
+          />
+        </div>
+        </div>
+      <br></br>
 
         <div className="field is-grouped">
           <div className="control">
