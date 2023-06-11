@@ -1,24 +1,27 @@
-const Sequelize = require('sequelize');
-const database = require('../database/database');
+const mongoose = require('mongoose');
 
-const Ponto = database.define('ponto',{
-    id:{
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-        primaryKey: true
+const pontoSchema = new mongoose.Schema({
+  nome: {
+    type: String,
+    required: true,
+  },
+  descricao: {
+    type: String,
+    required: true,
+  },
+  geometria: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true,
     },
-    nome:{
-        type: Sequelize.STRING,
-        allowNull: false
+    coordinates: {
+      type: [Number],
+      required: true,
     },
-    descricao:{
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    geometria:{
-        type: Sequelize.GEOMETRY,
-        allowNull: false
-    }
+  },
 });
+
+const Ponto = mongoose.model('Ponto', pontoSchema);
 
 module.exports = Ponto;
