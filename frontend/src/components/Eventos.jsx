@@ -50,6 +50,9 @@ const Eventos = () => {
               <div className="card-content">
                 <h2 className="title is-4">{evento.nome}</h2>
                 <p>{evento.descricao}</p>
+                <p>{evento.dataInicio}</p>
+                <p>{evento.dataFinal}</p>
+                <p> </p>
                 <div className="field is-size-7">
                   <label htmlFor="localizacao" className="label">
                     Localização do Evento:

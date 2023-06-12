@@ -30,6 +30,6 @@ const pontoSchema = new mongoose.Schema({
   },
 });
 
-const Ponto = mongoose.model('Ponto', pontoSchema,'EventosAcademicos');
+const Ponto = mongoose.model('Ponto', pontoSchema,'Ponto');
 
 module.exports = Ponto;

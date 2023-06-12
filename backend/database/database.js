@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 async function connectToMongoDB() {
   try {
     await mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.ATLAS_HOST}/?retryWrites=true&w=majority`, {
-      useNewUrlParser: true,
+    dbName: 'EventosAcademicos', 
+    useNewUrlParser: true,
       useUnifiedTopology: true,
     });
     console.log('Conexão com o MongoDB estabelecida com sucesso!');

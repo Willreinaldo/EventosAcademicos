@@ -44,6 +44,7 @@ const buscarPonto = async (request, response) => {
 
 const deletarPonto = async (request, response) => {
   const { id } = request.params;
+  console.log('ID:', id); // Verifique o valor do ID aqui
   try {
     const ponto = await Ponto.findByIdAndDelete(id);
     if (!ponto) {
