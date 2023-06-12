@@ -9,6 +9,8 @@ const EditarEvento = () => {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [localizacao, setLocalizacao] = useState("");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataTermino, setDataTermino] = useState("");
   const [isLoading, setIsLoading] = useState(true); // Use um estado isLoading para controlar o carregamento do evento
 
   useEffect(() => {
@@ -18,6 +20,8 @@ const EditarEvento = () => {
         setNome(data.nome);
         setDescricao(data.descricao);
         setLocalizacao(data.localizacao);
+        setDataTermino(data.dataTermino);
+        setDataInicio(data.dataInicio);
         setIsLoading(false); // Quando as informações do evento forem carregadas, defina isLoading como falso
       })
       .catch((error) => alert("Falha ao carregar as informações do evento!"));

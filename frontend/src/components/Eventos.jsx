@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+const dayjs = require('dayjs');
 
 const Eventos = () => {
+
   const [eventos, setEventos] = useState([]);
 
   const verNoMapa = (localizacao) => {
@@ -12,25 +14,29 @@ const Eventos = () => {
   useEffect(() => {
     fetch("http://localhost:4000/pontos")
       .then((response) => response.json())
-      .then((data) => {
+       .then((data) => {
         const eventosFormatados = data.map((evento) => ({
           ...evento,
           localizacao: {
             latitude: evento.geometria.coordinates[1],
             longitude: evento.geometria.coordinates[0],
           },
-        }));
+          dataInicio: dayjs(evento.dataInicio).format('DD/MM/YYYY'),
+          dataTermino: dayjs(evento.dataTermino).format('DD/MM/YYYY'),
+        }))
+        
+
         setEventos(eventosFormatados);
       })
       .catch((error) => console.error(error));
   }, []);
-  
+
   const handleDelete = (id) => {
     fetch(`http://localhost:4000/pontos/${id}`, {
       method: "DELETE",
     })
       .then(() => {
-        setEventos(eventos.filter((evento) => evento.id !== id));
+        setEventos(eventos.filter((evento) => evento._id !== id));
       })
       .catch((error) => console.error(error));
   };
@@ -51,7 +57,7 @@ const Eventos = () => {
                 <h2 className="title is-4">{evento.nome}</h2>
                 <p>{evento.descricao}</p>
                 <p>{evento.dataInicio}</p>
-                <p>{evento.dataFinal}</p>
+                <p>{evento.dataTermino}</p>
                 <p> </p>
                 <div className="field is-size-7">
                   <label htmlFor="localizacao" className="label">
@@ -84,7 +90,7 @@ const Eventos = () => {
                     <div className="column is-narrow">
                       <Link
                         className="button is-small"
-                        to={`/eventos/${evento.id}`}
+                        to={`/eventos/${evento._id}`}
                       >
                         <span className="icon">
                           <i className="fas fa-edit"></i>
@@ -93,7 +99,7 @@ const Eventos = () => {
                       </Link>
                       <button
                         className="button is-small is-danger"
-                        onClick={() => handleDelete(evento.id)}
+                        onClick={() => handleDelete(evento._id)}
                       >
                         <span className="icon">
                           <i className="fas fa-trash-alt"></i>

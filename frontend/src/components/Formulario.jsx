@@ -4,22 +4,19 @@ import EditarEvento from "./EditarEvento";
 import "bulma/css/bulma.css";
 
 const Formulario = ({ markerPosition, localizacao }) => {
+  const today = new Date();
+
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [dataInicio, setDataInicio] = useState("");
-  const [dataTermino, setDataTermino] = useState("");
+  const [dataInicio, setDataInicio] = useState(today);
+  const [dataTermino, setDataTermino] = useState(today);
   const navigate = useNavigate();
 
   const handleVerEventos = () => {
     navigate("/eventos");
   };
 
-  useEffect(() => {
-    console.log("datas: ",dataInicio,dataTermino); 
-  }, []);
-
   const salvar = async () => {
-    console.log("datas salvar: ",dataInicio,dataTermino); 
     if (!nome) {
       alert("Nome não pode ser vazio.");
       return;
