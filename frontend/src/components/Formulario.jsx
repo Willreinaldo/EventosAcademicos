@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import EditarEvento from "./EditarEvento";
-import "bulma/css/bulma.css";
+ import "bulma/css/bulma.css";
 
 const Formulario = ({ markerPosition, localizacao }) => {
   const today = new Date();
