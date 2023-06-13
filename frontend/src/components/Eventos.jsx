@@ -24,8 +24,8 @@ const Eventos = () => {
             latitude: evento.geometria.coordinates[1],
             longitude: evento.geometria.coordinates[0],
           },
-          dataInicio: dayjs(evento.dataInicio).format('DD/MM/YYYY'),
-          dataTermino: dayjs(evento.dataTermino).format('DD/MM/YYYY'),
+          dataInicio : dayjs(evento.dataInicio).add(1, 'day').format('DD/MM/YYYY'),
+          dataTermino: dayjs(evento.dataTermino).add(1, 'day').format('DD/MM/YYYY')
         }));
         setEventos(eventosFormatados);
        })
