@@ -8,7 +8,6 @@ const [lng, lat] = localizacao.split(',').map(parseFloat);
 const geometria = { type: 'Point', coordinates: [lng, lat] };
 
 const ponto = new Ponto({ nome, descricao, dataInicio, dataTermino, geometria });
-  console.log(ponto);
   try {
     await ponto.save();
     response.status(200).send('Ponto salvo!');
@@ -44,7 +43,6 @@ const buscarPonto = async (request, response) => {
 
 const deletarPonto = async (request, response) => {
   const { id } = request.params;
-  console.log('ID:', id); // Verifique o valor do ID aqui
   try {
     const ponto = await Ponto.findByIdAndDelete(id);
     if (!ponto) {
@@ -59,13 +57,25 @@ const deletarPonto = async (request, response) => {
 
 const atualizarPonto = async (request, response) => {
   const { id } = request.params;
-  console.log(id);
-  const { nome, descricao, localizacao } = request.body;
+  const { nome, descricao, localizacao, dataInicio, dataTermino } = request.body;
+  const coordenadas = localizacao.split(',').map(coord => parseFloat(coord.trim()));
+
   try {
-    const ponto = await Ponto.findByIdAndUpdate(id, { nome, descricao, localizacao }, { new: true });
+    const ponto = await Ponto.findByIdAndUpdate(id, {
+      nome,
+      descricao,
+      geometria: {
+        type: "Point",
+        coordinates: coordenadas,
+      },
+      dataInicio,
+      dataTermino,
+    }, { new: true });
+
     if (!ponto) {
       return response.status(404).send('Ponto não encontrado.');
     }
+
     response.status(200).send('Ponto atualizado com sucesso.');
   } catch (error) {
     console.error(error);

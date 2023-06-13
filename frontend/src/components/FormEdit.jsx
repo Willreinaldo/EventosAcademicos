@@ -4,42 +4,39 @@ import "bulma/css/bulma.css";
 import { Map, Marker, GoogleApiWrapper } from "google-maps-react";
 
     const FormEdit = ({ markerPosition, localizacao }) => {
-    const { id } = useParams(); // Obtenha o ID do evento da URL
-    console.log(id);
+     const { id } = useParams(); // Obtenha o ID do evento da URL
     const navigate = useNavigate();
     const [nome, setNome] = useState("");
     const [descricao, setDescricao] = useState("");
-   const [local, setLocal] = useState(localizacao);
     const [dataInicio, setDataInicio] = useState("");
     const [dataTermino, setDataTermino] = useState("");
-    const [isLoading, setIsLoading] = useState(true); // Use um estado isLoading para controlar o carregamento do evento
+    const [isLoading, setIsLoading] = useState(true);  
   
     useEffect(() => {
-      fetch(`http://localhost:4000/pontos/${id}`) // Faça uma solicitação para buscar as informações do evento com o ID fornecido na URL
+      fetch(`http://localhost:4000/pontos/${id}`) 
         .then((response) => response.json())
         .then((data) => {
           setNome(data.nome);
           setDescricao(data.descricao);
           setDataTermino(data.dataTermino);
           setDataInicio(data.dataInicio);
-          setIsLoading(false); // Quando as informações do evento forem carregadas, defina isLoading como falso
+          setIsLoading(false);  
         })
         .catch((error) => alert("Falha ao carregar as informações do evento!"));
     }, [id]);
   
     const handleSalvar = async () => {
-      console.log(local);
       if (!nome) {
         alert("Nome não pode ser vazio.");
         return;
       }
-  
+      console.log("local: ",localizacao);
       const obj = {
         nome: nome,
         dataInicio: dataInicio,
         dataTermino: dataTermino,
         descricao: descricao,
-        localizacao: local,
+        localizacao: localizacao,
       };
   
       fetch(`http://localhost:4000/pontos/${id}`, {
@@ -96,7 +93,6 @@ import { Map, Marker, GoogleApiWrapper } from "google-maps-react";
               className="input"
               type="text"
               value={(localizacao)}
-               onChange={(e) => setLocal(e.target.value)}
                readOnly
             />
           </div>

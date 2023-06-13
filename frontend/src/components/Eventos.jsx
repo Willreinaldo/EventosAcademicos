@@ -3,18 +3,21 @@ import { Link } from "react-router-dom";
 const dayjs = require('dayjs');
 
 const Eventos = () => {
-
   const [eventos, setEventos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
 
   const verNoMapa = (localizacao) => {
-    const { latitude, longitude } = localizacao;
-    const url = `https://www.google.com/maps/place/${longitude},${latitude}`;
-    window.open(url, "_blank");
+    const { longitude, latitude } = localizacao;
+  
+     const url = `https://www.google.com.br/maps/place/${longitude},${latitude}`;
+  
+     window.open(url, "_blank");
   };
   useEffect(() => {
     fetch("http://localhost:4000/pontos")
       .then((response) => response.json())
-       .then((data) => {
+      .then((data) => {
         const eventosFormatados = data.map((evento) => ({
           ...evento,
           localizacao: {
@@ -23,11 +26,9 @@ const Eventos = () => {
           },
           dataInicio: dayjs(evento.dataInicio).format('DD/MM/YYYY'),
           dataTermino: dayjs(evento.dataTermino).format('DD/MM/YYYY'),
-        }))
-        
-
+        }));
         setEventos(eventosFormatados);
-      })
+       })
       .catch((error) => console.error(error));
   }, []);
 
@@ -40,6 +41,11 @@ const Eventos = () => {
       })
       .catch((error) => console.error(error));
   };
+
+  const filteredEventos = eventos.filter((evento) =>
+    evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
       <h1 className="title is-1">Lista de Eventos</h1>
@@ -49,8 +55,24 @@ const Eventos = () => {
         </Link>
       </div>
 
+      <div className="field">
+        <label htmlFor="search" className="label">
+          Buscar evento:
+        </label>
+        <div className="control">
+          <input
+            type="text"
+            id="search"
+            name="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="input"
+          />
+        </div>
+      </div>
+    <br></br>
       <div className="columns is-multiline">
-        {eventos.map((evento) => (
+        {filteredEventos.map((evento) => (
           <div key={evento.id} className="column is-one-third">
             <div className="card">
               <div className="card-content">
