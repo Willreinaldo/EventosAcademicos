@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 const dayjs = require('dayjs');
 
 const Eventos = () => {
   const [eventos, setEventos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [filteredEventos, setFilteredEventos] = useState([]);
 
   const verNoMapa = (localizacao) => {
     const { longitude, latitude } = localizacao;
@@ -14,37 +15,55 @@ const Eventos = () => {
   
      window.open(url, "_blank");
   };
+  
   useEffect(() => {
-    fetch("http://localhost:4000/pontos")
-      .then((response) => response.json())
-      .then((data) => {
-        const eventosFormatados = data.map((evento) => ({
-          ...evento,
-          localizacao: {
-            latitude: evento.geometria.coordinates[1],
-            longitude: evento.geometria.coordinates[0],
-          },
-          dataInicio : dayjs(evento.dataInicio).add(1, 'day').format('DD/MM/YYYY'),
-          dataTermino: dayjs(evento.dataTermino).add(1, 'day').format('DD/MM/YYYY')
-        }));
-        setEventos(eventosFormatados);
-       })
-      .catch((error) => console.error(error));
+    fetchEventos();
   }, []);
 
-  const handleDelete = (id) => {
-    fetch(`http://localhost:4000/pontos/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => {
-        setEventos(eventos.filter((evento) => evento._id !== id));
-      })
-      .catch((error) => console.error(error));
+  useEffect(() => {
+    filterEventos();
+  }, [searchTerm]);
+
+  const fetchEventos = async () => {
+    try {
+      const response = await axios.get("http://localhost:4000/pontos");
+      const data = response.data;
+      const eventosFormatados = data.map((evento) => ({
+        ...evento,
+        localizacao: {
+          latitude: evento.geometria.coordinates[1],
+          longitude: evento.geometria.coordinates[0],
+        },
+        dataInicio: dayjs(evento.dataInicio).add(1, 'day').format('DD/MM/YYYY'),
+        dataTermino: dayjs(evento.dataTermino).add(1, 'day').format('DD/MM/YYYY')
+      }));
+      setEventos(eventosFormatados);
+      setFilteredEventos(eventosFormatados);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const filteredEventos = eventos.filter((evento) =>
-    evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filterEventos = () => {
+    const filtered = eventos.filter((evento) =>
+      evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredEventos(filtered);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:4000/pontos/${id}`);
+      setEventos(eventos.filter((evento) => evento._id !== id));
+      setFilteredEventos(filteredEventos.filter((evento) => evento._id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
 
   return (
     <div>
@@ -65,12 +84,13 @@ const Eventos = () => {
             id="search"
             name="search"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearch}
             className="input"
           />
         </div>
       </div>
-    <br></br>
+      <br />
+
       <div className="columns is-multiline">
         {filteredEventos.map((evento) => (
           <div key={evento.id} className="column is-one-third">
@@ -78,8 +98,8 @@ const Eventos = () => {
               <div className="card-content">
                 <h2 className="title is-4">{evento.nome}</h2>
                 <p>{evento.descricao}</p>
-                <p>{evento.dataInicio}</p>
-                <p>{evento.dataTermino}</p>
+                <p><strong>Data de início: </strong>{evento.dataInicio}</p>
+                <p><strong>Data de término: </strong>{evento.dataTermino}</p>
                 <p> </p>
                 <div className="field is-size-7">
                   <label htmlFor="localizacao" className="label">
