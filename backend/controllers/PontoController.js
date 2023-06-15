@@ -50,13 +50,13 @@ const buscarEventos = async (req, res) => {
   try {
     let eventos;
     if (searchTerm) {
-      eventos = await Ponto.find(
-        { $text: { $search: searchTerm } },
-        { score: { $meta: 'textScore' } }
-      )
-        .sort({ score: { $meta: 'textScore' } })
-        .exec();
-    } else {
+      eventos = await Ponto.find({
+        $or: [
+          { nome: { $regex: searchTerm, $options: 'i' } },
+          { descricao: { $regex: searchTerm, $options: 'i' } }
+        ]
+      });
+    }else {
       eventos = await Ponto.find();
     }
     console.log(eventos);
