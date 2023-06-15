@@ -28,35 +28,44 @@ const getPontos = async (request, response) => {
 };
 
 const buscarPonto = async (req, res) => {
-  const { searchTerm } = req.query;
+  const { id } = req.params;  
   try {
-    const pontos = await Ponto.find({
-      nome: { $regex: searchTerm, $options: "i" },
-    });
-    res.json(pontos);
+    const ponto = await Ponto.findById(id).lean();  
+
+    if (!ponto) {
+      return res.status(404).json({ message: "Ponto não encontrado." });
+    }
+
+    res.json(ponto);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erro ao buscar pontos." });
+    res.status(500).json({ message: "Erro ao buscar o ponto." });
   }
 };
+
 const buscarEventos = async (req, res) => {
   const { searchTerm } = req.query;
+  console.log("searchTerm: ", searchTerm);
 
   try {
-    const eventos = await Ponto.find(
-      { $text: { $search: searchTerm } },
-      { score: { $meta: 'textScore' } }
-    )
-      .sort({ score: { $meta: 'textScore' } })
-      .exec();
-
+    let eventos;
+    if (searchTerm) {
+      eventos = await Ponto.find(
+        { $text: { $search: searchTerm } },
+        { score: { $meta: 'textScore' } }
+      )
+        .sort({ score: { $meta: 'textScore' } })
+        .exec();
+    } else {
+      eventos = await Ponto.find();
+    }
+    console.log(eventos);
     res.json(eventos);
-  } catch (error) {
+   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao buscar eventos.' });
   }
 };
-
 const deletarPonto = async (request, response) => {
   const { id } = request.params;
   try {
@@ -99,4 +108,4 @@ const atualizarPonto = async (request, response) => {
   }
 };
 
-module.exports = { addPonto, getPontos, buscarPonto, atualizarPonto, deletarPonto, buscarEventos };
+module.exports = { addPonto,buscarEventos, getPontos, buscarPonto, atualizarPonto, deletarPonto };

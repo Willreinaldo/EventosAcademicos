@@ -7,7 +7,7 @@ const Eventos = () => {
   const [eventos, setEventos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEventos, setFilteredEventos] = useState([]);
-  const [loading, setLoading] = useState(false); // Novo estado para controlar o carregamento
+  const [loading, setLoading] = useState(false);
 
   const verNoMapa = (localizacao) => {
     const { longitude, latitude } = localizacao;
@@ -16,20 +16,28 @@ const Eventos = () => {
   
      window.open(url, "_blank");
   };
-  
+  const filterEventos = (term) => {
+    const lowerCaseTerm = term.toLowerCase();
+    const filtered = eventos.filter(evento => evento.nome.toLowerCase().includes(lowerCaseTerm));
+    setFilteredEventos(filtered);
+  };
   useEffect(() => {
     fetchEventos();
   }, []);
 
   useEffect(() => {
-    filterEventos();
-  }, [searchTerm, loading]);  
+    if (searchTerm === "") {
+      setFilteredEventos(eventos);
+    } else {
+      filterEventos(searchTerm);
+    }
+  }, [searchTerm, eventos]);
+
+  
   const fetchEventos = async () => {
     try {
       setLoading(true);  
-      const response = await axios.get("http://localhost:4000/pontos/buscar", {
-        params: { searchTerm },
-      });
+      const response = await axios.get("http://localhost:4000/pontos");
       const data = response.data;
       const eventosFormatados = data.map((evento) => ({
         ...evento,
@@ -47,16 +55,34 @@ const Eventos = () => {
       console.error(error);
     }
   };
-
-  const filterEventos = () => {
-    const filtered = eventos
-      .filter((evento) =>
-        evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      .sort((a, b) => a.dataInicio - b.dataInicio);
-    setFilteredEventos(filtered);
-  };
+  const handleSearch = async (e) => {
+    try {
+      setLoading(true);
+      const value = e.target.value.trim();
+      setSearchTerm(value); 
   
+       const searchValue = value === "" ? searchTerm : value;
+  
+      const response = await axios.get("http://localhost:4000/pontos/buscar", {
+        params: { searchTerm: searchValue },
+      });
+      const data = response.data;
+      const eventosFormatados = data.map((evento) => ({
+        ...evento,
+        localizacao: {
+          latitude: evento.geometria.coordinates[1],
+          longitude: evento.geometria.coordinates[0],
+        },
+        dataInicio: dayjs(evento.dataInicio).add(1, 'day').format('DD/MM/YYYY'),
+        dataTermino: dayjs(evento.dataTermino).add(1, 'day').format('DD/MM/YYYY')
+      }));
+      setFilteredEventos(eventosFormatados);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -66,10 +92,6 @@ const Eventos = () => {
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
   };
 
   return (
@@ -100,7 +122,7 @@ const Eventos = () => {
 
       <div className="columns is-multiline">
         {filteredEventos.map((evento) => (
-          <div key={evento.id} className="column is-one-third">
+          <div key={evento._id} className="column is-one-third">
             <div className="card">
               <div className="card-content">
                 <h2 className="title is-4">{evento.nome}</h2>

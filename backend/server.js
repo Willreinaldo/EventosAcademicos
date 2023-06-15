@@ -16,16 +16,15 @@ const cors = require('cors');
   console.log('Conexão com o MongoDB estabelecida com sucesso!');
 });
 
-configurarBancoDeDados();
 
 
 // Definir as rotas
 app.post('/pontos', addPonto);
+app.get('/pontos/buscar', buscarEventos);  
 app.get('/pontos/:id', buscarPonto);
 app.put('/pontos/:id',atualizarPonto);
 app.delete('/pontos/:id',deletarPonto);
 app.get('/pontos',  getPontos);
-app.get('/pontos/buscar', buscarEventos);  
 
 
 // Iniciar o servidor

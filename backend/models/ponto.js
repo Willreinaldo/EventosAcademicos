@@ -4,10 +4,12 @@ const pontoSchema = new mongoose.Schema({
   nome: {
     type: String,
     required: true,
+    text: true
   },
   descricao: {
     type: String,
     required: true,
+    text: true
   },
   dataInicio: {
     type: Date,
