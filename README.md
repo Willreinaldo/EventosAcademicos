@@ -15,11 +15,6 @@ Para executar o projeto localmente, você precisará ter o seguinte software ins
 * Instale as dependências do projeto utilizando o comando npm install dentro da pasta do projeto.
 * Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
 ```
-PG_DATABASE=<nome_do_banco_de_dados>
-PG_USERNAME=<seu_nome_de_usuario_do_banco_de_dados>
-PG_PASSWORD=<sua_senha_do_banco_de_dados>
-PG_HOST=<endereco_do_host_do_banco_de_dados>
-PG_PORT=<porta_do_banco_de_dados>
 MONGO_USER=<nome_do_user_do_banco_de_dados>
 MONGO_PASSWORD=<sennha_do_banco_de_dados>
 ATLAS_HOST=<host_do_banco_de_dados>
