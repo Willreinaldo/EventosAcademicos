@@ -7,6 +7,7 @@ const Eventos = () => {
   const [eventos, setEventos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEventos, setFilteredEventos] = useState([]);
+  const [loading, setLoading] = useState(false); // Novo estado para controlar o carregamento
 
   const verNoMapa = (localizacao) => {
     const { longitude, latitude } = localizacao;
@@ -22,11 +23,13 @@ const Eventos = () => {
 
   useEffect(() => {
     filterEventos();
-  }, [searchTerm]);
-
+  }, [searchTerm, loading]);  
   const fetchEventos = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/pontos");
+      setLoading(true);  
+      const response = await axios.get("http://localhost:4000/pontos/buscar", {
+        params: { searchTerm },
+      });
       const data = response.data;
       const eventosFormatados = data.map((evento) => ({
         ...evento,
@@ -39,17 +42,21 @@ const Eventos = () => {
       }));
       setEventos(eventosFormatados);
       setFilteredEventos(eventosFormatados);
+      setLoading(false);  
     } catch (error) {
       console.error(error);
     }
   };
 
   const filterEventos = () => {
-    const filtered = eventos.filter((evento) =>
-      evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filtered = eventos
+      .filter((evento) =>
+        evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => a.dataInicio - b.dataInicio);
     setFilteredEventos(filtered);
   };
+  
 
   const handleDelete = async (id) => {
     try {

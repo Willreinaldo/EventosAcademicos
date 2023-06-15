@@ -27,17 +27,16 @@ const getPontos = async (request, response) => {
   }
 };
 
-const buscarPonto = async (request, response) => {
-  const { id } = request.params;
+const buscarPonto = async (req, res) => {
+  const { searchTerm } = req.query;
   try {
-    const ponto = await Ponto.findById(id);
-    if (!ponto) {
-      return response.status(404).send('Ponto não encontrado.');
-    }
-    response.status(200).json(ponto);
+    const pontos = await Ponto.find({
+      nome: { $regex: searchTerm, $options: "i" },
+    });
+    res.json(pontos);
   } catch (error) {
     console.error(error);
-    response.status(500).send('Falha ao buscar o ponto.');
+    res.status(500).json({ message: "Erro ao buscar pontos." });
   }
 };
 const buscarEventos = async (req, res) => {
@@ -57,6 +56,7 @@ const buscarEventos = async (req, res) => {
     res.status(500).json({ message: 'Erro ao buscar eventos.' });
   }
 };
+
 const deletarPonto = async (request, response) => {
   const { id } = request.params;
   try {

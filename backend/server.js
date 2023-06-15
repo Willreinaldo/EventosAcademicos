@@ -25,7 +25,7 @@ app.get('/pontos/:id', buscarPonto);
 app.put('/pontos/:id',atualizarPonto);
 app.delete('/pontos/:id',deletarPonto);
 app.get('/pontos',  getPontos);
-app.get('/eventos/buscar', buscarEventos);  
+app.get('/pontos/buscar', buscarEventos);  
 
 
 // Iniciar o servidor
