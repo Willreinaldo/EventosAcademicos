@@ -3,11 +3,9 @@ const Ponto = require('../models/ponto');
 
 const configurarBancoDeDados = async () => {
   try {
-    // Verificar se o índice de texto já existe
-    const indexExists = await Ponto.collection.indexExists({ nome: 'text', descricao: 'text' });
+     const indexExists = await Ponto.collection.indexExists({ nome: 'text', descricao: 'text' });
 
-    // Se o índice não existir, criar
-    if (!indexExists) {
+     if (!indexExists) {
       await Ponto.createIndexes(
         { nome: 'text', descricao: 'text' },
         { weights: { nome: 2, descricao: 1 } }

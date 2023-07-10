@@ -4,7 +4,7 @@ import "bulma/css/bulma.css";
 import { Map, Marker, GoogleApiWrapper } from "google-maps-react";
 
     const FormEdit = ({ markerPosition, localizacao }) => {
-     const { id } = useParams(); // Obtenha o ID do evento da URL
+     const { id } = useParams();  
     const navigate = useNavigate();
     const [nome, setNome] = useState("");
     const [descricao, setDescricao] = useState("");
@@ -55,7 +55,7 @@ import { Map, Marker, GoogleApiWrapper } from "google-maps-react";
     };
   
     const handleCancelar = () => {
-      navigate("/eventos"); // Redireciona o usuário de volta para a página de eventos sem salvar as alterações
+      navigate("/eventos");  
     };
   
     if (isLoading) {
