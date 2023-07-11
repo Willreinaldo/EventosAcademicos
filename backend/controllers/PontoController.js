@@ -1,21 +1,47 @@
 const Ponto = require('../models/ponto');
+const driver = require('../database/neo4j');
 
 const addPonto = async (request, response) => {
-  console.log(request.body);
-const { nome, descricao, localizacao, dataInicio, dataTermino } = request.body;
-const [lng, lat] = localizacao.split(',').map(parseFloat);
+  const { nome, descricao, localizacao, dataInicio, dataTermino, usuarioId } = request.body;
 
-const geometria = { type: 'Point', coordinates: [lng, lat] };
+  // Código para criar o evento no MongoDB
+  const ponto = new Ponto({
+    nome,
+    descricao,
+    localizacao,
+    dataInicio,
+    dataTermino,
+  });
 
-const ponto = new Ponto({ nome, descricao, dataInicio, dataTermino, geometria });
   try {
     await ponto.save();
-    response.status(200).send('Ponto salvo!');
+    console.log('Evento salvo no MongoDB');
+
+    // Código para criar a relação no Neo4j
+    const session = driver.session();
+
+    try {
+      const result = await session.run(
+        'MATCH (u:Usuario {id: $usuarioId}), (e:Evento {id: $eventoId}) CREATE (u)-[:RELACIONADO]->(e)',
+        { usuarioId, eventoId: ponto._id.toString() }
+      );
+
+      console.log('Relacionamento criado com sucesso no Neo4j');
+    } catch (error) {
+      console.error('Erro ao criar relacionamento no Neo4j:', error);
+      response.status(500).json({ error: 'Erro ao criar relacionamento no Neo4j' });
+      return;
+    } finally {
+      session.close();
+      driver.close();
+    }
+
+    response.status(200).send('Ponto salvo e relacionamento criado com sucesso');
   } catch (err) {
     console.error(err);
-    response.status(400).send('Falha ao salvar');
+    response.status(400).send('Falha ao salvar evento');
   }
-};
+}; 
 
 const getPontos = async (request, response) => {
   try {

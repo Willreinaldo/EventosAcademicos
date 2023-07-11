@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
  import "bulma/css/bulma.css";
-
+ 
 const Formulario = ({ markerPosition, localizacao }) => {
   const today = new Date();
 
@@ -31,21 +31,44 @@ const Formulario = ({ markerPosition, localizacao }) => {
         coordinates: [markerPosition.lng, markerPosition.lat],
       },
     };
-
-    fetch("http://localhost:4000/pontos", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(obj),
-    })
-      .then((response) => {
+  
+    try {
+      const response = await fetch("http://localhost:4000/pontos", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
         alert("Salvo com sucesso");
-      })
-      .catch((error) => alert("Falha ao salvar!"));
+  
+        const eventoId = data._id; 
+        const usuarioId = "123";
+        const neo4jResponse = await fetch("http://localhost:4000/associar-evento-usuario", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ eventoId, usuarioId }),
+        });
+  
+        if (neo4jResponse.ok) {
+          console.log("Relacionamento criado com sucesso no Neo4j");
+        } else {
+          console.error("Erro ao criar relacionamento no Neo4j");
+        }
+      } else {
+        console.error("Falha ao salvar!");
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+    }
   };
-
   return (
     <div
       id="form"

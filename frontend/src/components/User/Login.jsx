@@ -18,6 +18,10 @@ const Login = () => {
         body: JSON.stringify({ email, senha }),
       });
       if (response.ok) {
+        const data = await response.json();
+        const token = data.token; 
+       localStorage.setItem('token', token);
+
         console.log('Login realizado com sucesso!'); // Exibe mensagem de sucesso
         window.alert("Login realizado com sucesso!");
         setEmail('');
