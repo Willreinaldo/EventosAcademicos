@@ -20,8 +20,9 @@ const addPonto = async (request, response) => {
     geometria
   });
   console.log("geometria:", geometria);
-  const { usuarioId } = geometria;
-  console.log("")
+  const { usuario } = geometria;
+  const usuarioId = usuario;
+
   try {
     await ponto.save();
     console.log('Evento salvo no MongoDB');
@@ -45,6 +46,7 @@ const addPonto = async (request, response) => {
     } catch (error) {
       console.error('Erro ao criar evento ou relacionamento no Neo4j:', error);
       response.status(500).json({ error: 'Erro ao criar evento ou relacionamento no Neo4j' });
+      
       return;
     } finally {
       session.close();
@@ -111,14 +113,28 @@ const buscarEventos = async (req, res) => {
 const deletarPonto = async (request, response) => {
   const { id } = request.params;
   try {
+    // Excluir evento no MongoDB
     const ponto = await Ponto.findByIdAndDelete(id);
     if (!ponto) {
       return response.status(404).send('Ponto não encontrado.');
     }
-    response.status(200).send('Ponto deletado com sucesso.');
+
+    // Excluir evento no Neo4j
+    const session = driver.session();
+    try {
+      await session.run('MATCH (e:Evento {id: $eventoId}) DETACH DELETE e', { eventoId: id });
+      console.log('Evento excluído do Neo4j');
+
+      response.status(200).send('Ponto deletado com sucesso.');
+    } catch (error) {
+      console.error('Erro ao excluir evento do Neo4j:', error);
+      response.sendStatus(500);
+    } finally {
+      session.close();
+    }
   } catch (error) {
     console.error(error);
-    response.status(500).send('Falha ao deletar o ponto.');
+    response.status(500).send('Falha ao deletar o ponto no MongoDB.');
   }
 };
 
