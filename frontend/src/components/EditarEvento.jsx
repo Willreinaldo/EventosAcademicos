@@ -5,7 +5,7 @@ import { Map, Marker, GoogleApiWrapper } from "google-maps-react";
 import FormEdit from "./FormEdit";
 
 const EditarEvento = (props) => {
-
+  console.log(props);
   const [markerPosition, setMarkerPosition] = useState({
     lat: -6.888463202449027,
     lng: -38.558930105104125,
@@ -43,7 +43,7 @@ const EditarEvento = (props) => {
         </Map>
       </div>
       <div className="formulario-container">
-          <FormEdit markerPosition={markerPosition} localizacao={localizacao}/>
+          <FormEdit markerPosition={markerPosition} localizacao={localizacao} usuarioId={props.usuarioId}/>
       </div>
     </div>
   );

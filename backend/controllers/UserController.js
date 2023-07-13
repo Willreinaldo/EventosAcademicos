@@ -19,7 +19,6 @@ const verificarToken = (req, res, next) => {
 
   const token = tokenWithBearer.replace('Bearer', '');
 
-  console.log("token recebido da req do localstorage", token);
   if (!token) {
     return res.status(401).json({ error: 'Token não fornecido' });
   }
@@ -38,7 +37,6 @@ const verificarToken = (req, res, next) => {
 const buscarUsuarioLogado = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
-    console.log("buscar Usuario Logado", usuarioId);
     const usuario = await User.findById(usuarioId);
 
     // Verifique se o usuário foi encontrado
@@ -110,7 +108,6 @@ const realizarLogin = async (req, res) => {
 
   try {
     const usuario = await User.findOne({ email });
-    console.log(usuario);
     if (!usuario) {
       console.log("Usuário não encontrado'");
       return res.status(404).json({ error: 'Usuário não encontrado' });
@@ -131,9 +128,7 @@ const realizarLogin = async (req, res) => {
   }
 };
 const logout = async (req, res) => {
-  console.log("inicio do logout");
   const token = req.headers.authorization;
-  console.log("token no logout", token);
   try {
     const usuarioId = jwt.verify(token, 'chave_secreta').id;
     const usuario = await User.findById(usuarioId);

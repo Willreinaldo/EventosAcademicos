@@ -54,7 +54,7 @@ const addPonto = async (request, response) => {
   }
 }; 
 
-const getPontos = async (request, response) => {
+const getPontosAll = async (request, response) => {
   try {
     const pontos = await Ponto.find();
     response.status(200).send(pontos);
@@ -64,6 +64,18 @@ const getPontos = async (request, response) => {
   }
 };
 
+const getPontos = async (request, response) => {
+  try {
+    const userId = request.query.userId;
+    console.log(userId);
+    const pontos = await Ponto.find({ "geometria.usuario": userId });
+    console.log(pontos);
+    response.status(200).send(pontos);
+  }catch (err) {
+    console.error(err);
+    response.status(500).send('Falha ao buscar os pontos.');
+  }
+}
 const buscarPonto = async (req, res) => {
   const { id } = req.params;  
   try {
@@ -79,26 +91,28 @@ const buscarPonto = async (req, res) => {
     res.status(500).json({ message: "Erro ao buscar o ponto." });
   }
 };
-
 const buscarEventos = async (req, res) => {
   const { searchTerm } = req.query;
+  const usuarioId = req.query.userId;  
+
   console.log("searchTerm: ", searchTerm);
 
   try {
     let eventos;
     if (searchTerm) {
       eventos = await Ponto.find({
-        $or: [
-          { nome: { $regex: searchTerm, $options: 'i' } },
-          { descricao: { $regex: searchTerm, $options: 'i' } }
+        $and: [
+          { $text: { $search: searchTerm } },  
+          { "geometria.usuario": usuarioId }  
         ]
       });
-    }else {
-      eventos = await Ponto.find();
+    } else {
+      eventos = await Ponto.find({ "geometria.usuario": usuarioId });  
     }
+
     console.log(eventos);
     res.json(eventos);
-   } catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro ao buscar eventos.' });
   }
@@ -133,7 +147,7 @@ const deletarPonto = async (request, response) => {
 
 const atualizarPonto = async (request, response) => {
   const { id } = request.params;
-  const { nome, descricao, localizacao, dataInicio, dataTermino } = request.body;
+  const { nome, descricao, localizacao, dataInicio, dataTermino, usuario } = request.body;
   const coordenadas = localizacao.split(',').map(coord => parseFloat(coord.trim()));
 
   try {
@@ -143,6 +157,7 @@ const atualizarPonto = async (request, response) => {
       geometria: {
         type: "Point",
         coordinates: coordenadas,
+        usuario: usuario
       },
       dataInicio,
       dataTermino,
@@ -152,7 +167,26 @@ const atualizarPonto = async (request, response) => {
       return response.status(404).send('Ponto não encontrado.');
     }
 
-    response.status(200).send('Ponto atualizado com sucesso.');
+    console.log('Ponto atualizado no MongoDB');
+
+    const session = driver.session();
+
+    try {
+      // Atualização do nó do evento no Neo4j
+      await session.run(
+        'MATCH (e:Evento {id: $eventoId}) SET e.nome = $nome',
+        { eventoId: id, nome }
+      );
+
+      console.log('Ponto atualizado no Neo4j');
+
+      response.status(200).send('Ponto atualizado com sucesso.');
+    } catch (error) {
+      console.error('Erro ao atualizar ponto no Neo4j:', error);
+      response.sendStatus(500);
+    } finally {
+      session.close();
+    }
   } catch (error) {
     console.error(error);
     response.status(500).send('Falha ao atualizar o ponto.');

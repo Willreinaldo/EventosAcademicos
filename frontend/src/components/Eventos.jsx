@@ -4,7 +4,7 @@ import axios from "axios";
 const dayjs = require('dayjs');
 
 const Eventos = (props) => {
-  console.log("props usuarioId: ",props.nomeUsuario)
+  console.log("props usuarioId: ", props.nomeUsuario);
   const [eventos, setEventos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEventos, setFilteredEventos] = useState([]);
@@ -12,19 +12,54 @@ const Eventos = (props) => {
 
   const verNoMapa = (localizacao) => {
     const { longitude, latitude } = localizacao;
-  
-     const url = `https://www.google.com.br/maps/place/${longitude},${latitude}`;
-  
-     window.open(url, "_blank");
+
+    const url = `https://www.google.com.br/maps/place/${longitude},${latitude}`;
+
+    window.open(url, "_blank");
   };
+
   const filterEventos = (term) => {
     const lowerCaseTerm = term.toLowerCase();
-    const filtered = eventos.filter(evento => evento.nome.toLowerCase().includes(lowerCaseTerm));
+    const filtered = eventos.filter((evento) =>
+      evento.nome.toLowerCase().includes(lowerCaseTerm)
+    );
     setFilteredEventos(filtered);
   };
+
   useEffect(() => {
-    fetchEventos();
-  }, []);
+    const fetchEventos = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("http://localhost:4000/pontos", {
+          params: { userId: props.usuarioId },
+        });
+        const data = response.data;
+        const eventosFormatados = data.map((evento) => ({
+          ...evento,
+          localizacao: {
+            latitude: evento.geometria.coordinates[1],
+            longitude: evento.geometria.coordinates[0],
+          },
+          dataInicio: dayjs(evento.dataInicio)
+            .add(1, "day")
+            .format("DD/MM/YYYY"),
+          dataTermino: dayjs(evento.dataTermino)
+            .add(1, "day")
+            .format("DD/MM/YYYY"),
+        }));
+        setEventos(eventosFormatados);
+        setFilteredEventos(eventosFormatados);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      }
+    };
+
+    if (props.usuarioId) {
+      fetchEventos();
+    }
+  }, [props.usuarioId]);
 
   useEffect(() => {
     if (searchTerm === "") {
@@ -34,39 +69,16 @@ const Eventos = (props) => {
     }
   }, [searchTerm, eventos]);
 
-  
-  const fetchEventos = async () => {
-    try {
-      setLoading(true);  
-      const response = await axios.get("http://localhost:4000/pontos");
-      console.log(response);
-      const data = response.data;
-      const eventosFormatados = data.map((evento) => ({
-        ...evento,
-        localizacao: {
-          latitude: evento.geometria.coordinates[1],
-          longitude: evento.geometria.coordinates[0],
-        },
-        dataInicio: dayjs(evento.dataInicio).add(1, 'day').format('DD/MM/YYYY'),
-        dataTermino: dayjs(evento.dataTermino).add(1, 'day').format('DD/MM/YYYY')
-      }));
-      setEventos(eventosFormatados);
-      setFilteredEventos(eventosFormatados);
-      setLoading(false);  
-    } catch (error) {
-      console.error(error);
-    }
-  };
   const handleSearch = async (e) => {
     try {
       setLoading(true);
       const value = e.target.value.trim();
-      setSearchTerm(value); 
-  
-       const searchValue = value === "" ? searchTerm : value;
-  
+      setSearchTerm(value);
+
+      const searchValue = value === "" ? searchTerm : value;
+
       const response = await axios.get("http://localhost:4000/pontos/buscar", {
-        params: { searchTerm: searchValue },
+        params: { searchTerm: searchValue, userId: props.usuarioId  },
       });
       const data = response.data;
       const eventosFormatados = data.map((evento) => ({
@@ -75,8 +87,12 @@ const Eventos = (props) => {
           latitude: evento.geometria.coordinates[1],
           longitude: evento.geometria.coordinates[0],
         },
-        dataInicio: dayjs(evento.dataInicio).add(1, 'day').format('DD/MM/YYYY'),
-        dataTermino: dayjs(evento.dataTermino).add(1, 'day').format('DD/MM/YYYY')
+        dataInicio: dayjs(evento.dataInicio)
+          .add(1, "day")
+          .format("DD/MM/YYYY"),
+        dataTermino: dayjs(evento.dataTermino)
+          .add(1, "day")
+          .format("DD/MM/YYYY"),
       }));
       setFilteredEventos(eventosFormatados);
     } catch (error) {
@@ -125,14 +141,22 @@ const Eventos = (props) => {
       <div className="columns is-multiline">
         {filteredEventos.map((evento) => (
           <div key={evento._id} className="column is-one-third">
-            
             <div className="card">
               <div className="card-content">
-              <p><strong>Evento criado pelo usuário: </strong>{props.nomeUsuario}</p> 
+                <p>
+                  <strong>Evento criado pelo usuário: </strong>
+                  {props.nomeUsuario}
+                </p>
                 <h2 className="title is-4">{evento.nome}</h2>
                 <p>{evento.descricao}</p>
-                <p><strong>Data de início: </strong>{evento.dataInicio}</p>
-                <p><strong>Data de término: </strong>{evento.dataTermino}</p>
+                <p>
+                  <strong>Data de início: </strong>
+                  {evento.dataInicio}
+                </p>
+                <p>
+                  <strong>Data de término: </strong>
+                  {evento.dataTermino}
+                </p>
                 <p> </p>
                 <div className="field is-size-7">
                   <label htmlFor="localizacao" className="label">
@@ -144,10 +168,9 @@ const Eventos = (props) => {
                       id="localizacao"
                       name="localizacao"
                       value={JSON.stringify(evento.localizacao)
-                        .replace(/[{}"]/g, '') // remove os caracteres {, }, "
-                        .replace(/-/g, '')     // remove o caractere -
-                        .replace(/,/g, ', ')    // adiciona um espaço após a vírgula
-                      }
+                        .replace(/[{}"]/g, "") // remove os caracteres {, }, "
+                        .replace(/-/g, "") // remove o caractere -
+                        .replace(/,/g, ", ")} // adiciona um espaço após a vírgula
                       className="input is-size-7"
                       disabled
                     />

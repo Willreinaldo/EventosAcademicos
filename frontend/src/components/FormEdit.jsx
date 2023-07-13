@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "bulma/css/bulma.css";
 import { Map, Marker, GoogleApiWrapper } from "google-maps-react";
 
-    const FormEdit = ({ markerPosition, localizacao }) => {
+    const FormEdit = ({ markerPosition, localizacao, usuarioId }) => {
      const { id } = useParams();  
     const navigate = useNavigate();
     const [nome, setNome] = useState("");
@@ -37,6 +37,7 @@ import { Map, Marker, GoogleApiWrapper } from "google-maps-react";
         dataTermino: dataTermino,
         descricao: descricao,
         localizacao: localizacao,
+        usuario: usuarioId
       };
   
       fetch(`http://localhost:4000/pontos/${id}`, {
