@@ -7,6 +7,7 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
   const today = new Date();
 
   const [nome, setNome] = useState("");
+  const [loading, setLoading] = useState(false);
   const [descricao, setDescricao] = useState("");
   const [dataInicio, setDataInicio] = useState(today);
   const [dataTermino, setDataTermino] = useState(today);
@@ -25,6 +26,8 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
       alert("Nome não pode ser vazio.");
       return;
     }
+    setLoading(true);  
+
     console.log(usuarioId);
     const obj = {
       nome: nome,
@@ -56,6 +59,9 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
     } catch (error) {
       alert("Erro ao enviar evento", error);
 
+    }
+    finally {
+      setLoading(false);
     }
   };
   return (
@@ -154,11 +160,16 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
         <br></br>
 
         <div className="field is-grouped">
-          <div className="control">
-            <button type="button" onClick={salvar} className="button is-link">
-              Salvar
-            </button>
-          </div>
+              <div className="control">
+                <button
+                  type="button"
+                  onClick={salvar}
+                  className={`button is-link ${loading ? "is-loading" : ""}`}
+                  disabled={loading}
+                >
+                  Salvar
+                </button>
+              </div>
           <div className="control">
             <button
               type="button"

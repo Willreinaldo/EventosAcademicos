@@ -2,14 +2,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 //BANCO DE DADOS NEO4J  - CONFIG
-const neo4j = require('neo4j-driver');
-const driver = neo4j.driver(
-  'neo4j://localhost:7687',
-  neo4j.auth.basic('neo4j', 'neo4j123456')
-);
+const driver = require('../database/neo4j');
 
 
 const gerarToken = (usuarioId) => {
+  console.log(usuarioId);
   const token = jwt.sign({ id: usuarioId }, 'chave_secreta');
   console.log("token gerado", token);
   return token;
@@ -41,7 +38,7 @@ const verificarToken = (req, res, next) => {
 const buscarUsuarioLogado = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
-
+    console.log("buscar Usuario Logado", usuarioId);
     const usuario = await User.findById(usuarioId);
 
     // Verifique se o usuário foi encontrado
@@ -113,6 +110,7 @@ const realizarLogin = async (req, res) => {
 
   try {
     const usuario = await User.findOne({ email });
+    console.log(usuario);
     if (!usuario) {
       console.log("Usuário não encontrado'");
       return res.status(404).json({ error: 'Usuário não encontrado' });
@@ -132,10 +130,26 @@ const realizarLogin = async (req, res) => {
     res.status(500).json({ error: 'Erro ao realizar login' });
   }
 };
-
+const logout = async (req, res) => {
+  console.log("inicio do logout");
+  const token = req.headers.authorization;
+  console.log("token no logout", token);
+  try {
+    const usuarioId = jwt.verify(token, 'chave_secreta').id;
+    const usuario = await User.findById(usuarioId);
+    usuario.token = null; 
+    await usuario.save();
+    console.log("Logout realizado com sucesso");
+    res.status(200).json({ message: 'Logout realizado com sucesso' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao realizar logout' });
+  }
+};
 module.exports = {
   cadastrarUsuario,
   realizarLogin,
   verificarToken,
-  buscarUsuarioLogado
+  buscarUsuarioLogado,
+  logout
 };

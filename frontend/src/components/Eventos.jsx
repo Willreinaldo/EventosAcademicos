@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 const dayjs = require('dayjs');
 
-const Eventos = () => {
+const Eventos = (props) => {
+  console.log("props usuarioId: ",props.nomeUsuario)
   const [eventos, setEventos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredEventos, setFilteredEventos] = useState([]);
@@ -124,8 +125,10 @@ const Eventos = () => {
       <div className="columns is-multiline">
         {filteredEventos.map((evento) => (
           <div key={evento._id} className="column is-one-third">
+            
             <div className="card">
               <div className="card-content">
+              <p><strong>Evento criado pelo usuário: </strong>{props.nomeUsuario}</p> 
                 <h2 className="title is-4">{evento.nome}</h2>
                 <p>{evento.descricao}</p>
                 <p><strong>Data de início: </strong>{evento.dataInicio}</p>

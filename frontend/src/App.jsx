@@ -24,6 +24,7 @@ const AppRoutes = () => {
           }
         });
         const usuarioId = response.data._id;
+        console.log(response.data);
         setNomeUsuario(response.data.nome);
         setUsuarioId(usuarioId);
       } catch (error) {

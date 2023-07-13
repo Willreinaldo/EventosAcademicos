@@ -1,11 +1,7 @@
 const Ponto = require('../models/ponto');
  
-//BANCO DE DADOS NEO4J  - CONFIG
-const neo4j = require('neo4j-driver');
-const driver = neo4j.driver(
-  'neo4j://localhost:7687',
-  neo4j.auth.basic('neo4j', 'neo4j123456')
-);
+const driver = require('../database/neo4j');
+
 
 const addPonto = async (request, response) => {
   const { nome, descricao, localizacao, dataInicio, dataTermino, geometria } = request.body;
@@ -27,7 +23,6 @@ const addPonto = async (request, response) => {
     await ponto.save();
     console.log('Evento salvo no MongoDB');
 
-    // Código para criar o nó do evento no Neo4j e relacioná-lo ao usuário
     const session = driver.session();
 
     try {
@@ -50,7 +45,6 @@ const addPonto = async (request, response) => {
       return;
     } finally {
       session.close();
-      driver.close();
     }
 
     response.status(200).send('Evento salvo e relacionamento criado com sucesso');
@@ -119,8 +113,7 @@ const deletarPonto = async (request, response) => {
       return response.status(404).send('Ponto não encontrado.');
     }
 
-    // Excluir evento no Neo4j
-    const session = driver.session();
+     const session = driver.session();
     try {
       await session.run('MATCH (e:Evento {id: $eventoId}) DETACH DELETE e', { eventoId: id });
       console.log('Evento excluído do Neo4j');
