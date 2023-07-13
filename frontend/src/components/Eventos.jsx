@@ -38,6 +38,7 @@ const Eventos = () => {
     try {
       setLoading(true);  
       const response = await axios.get("http://localhost:4000/pontos");
+      console.log(response);
       const data = response.data;
       const eventosFormatados = data.map((evento) => ({
         ...evento,

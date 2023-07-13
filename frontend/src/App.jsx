@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import Eventos from './components/Eventos';
 import Cadastro from './components/User/Cadastro';
 import Login from './components/User/Login';
+import LogoutPage from './components/User/Logout';
+
 import EditarEvento from './components/EditarEvento';
 import Mapa from './components/Mapa';
 import axios from 'axios';
@@ -10,50 +12,78 @@ import 'bulma/css/bulma.min.css';
 
 const AppRoutes = () => {
   const [usuarioId, setUsuarioId] = useState("");
-
-  return (
-    <Router>
-      <Routes>
-        <Route element={<PrivateRoute setUsuarioId={setUsuarioId} />}>
-          <Route path="/" element={<Mapa usuarioId={usuarioId} />} />
-          <Route path="/eventos" element={<Eventos usuarioId={usuarioId} />} />
-          <Route path="/eventos/:id" element={<EditarEvento usuarioId={usuarioId} />} />
-        </Route>
-        <Route path="/cadastro" element={<Cadastro setUsuarioId={setUsuarioId} />} />
-        <Route path="/login" element={<Login setUsuarioId={setUsuarioId} />} />
-      </Routes>
-    </Router>
-  );
-};
-
-const PrivateRoute = ({ setUsuarioId }) => {
+  const [nomeUsuario, setNomeUsuario] = useState("");
   const token = localStorage.getItem('token');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const verificarLogin = async () => {
       try {
         const response = await axios.get("http://localhost:4000/usuarios/usuario", {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer${token}`
           }
         });
-    
-        const usuarioId = response.data.usuario._id;
+        const usuarioId = response.data._id;
+        setNomeUsuario(response.data.nome);
         setUsuarioId(usuarioId);
       } catch (error) {
-        navigate('/login');
+        console.log("Erro ao verificar login:", error);
       }
     };
 
     if (!token) {
-      navigate('/login');
-    } else {
-      verificarLogin();
+      return;
     }
-  }, [token, navigate]);
 
-  return null;
+    verificarLogin();
+  }, [token, setUsuarioId, setNomeUsuario]);
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login setUsuarioId={setUsuarioId} />} />
+        <Route path="/cadastro" element={<Cadastro setUsuarioId={setUsuarioId} />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Mapa usuarioId={usuarioId} nomeUsuario={nomeUsuario} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/eventos"
+          element={
+            <PrivateRoute>
+              <Eventos usuarioId={usuarioId} nomeUsuario={nomeUsuario} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/eventos/:id"
+          element={
+            <PrivateRoute>
+              <EditarEvento usuarioId={usuarioId} nomeUsuario={nomeUsuario}/>
+            </PrivateRoute>
+          }
+        />
+        <Route path="/logout" element={<LogoutPage />} />
+      </Routes>
+    </Router>
+  );
+};
+
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const isAuthenticated = !!token;
+  const navigate = useNavigate();
+
+  if (!isAuthenticated) {
+    navigate('/login');
+    return null;
+  }
+
+  return children;
 };
 
 export default AppRoutes;

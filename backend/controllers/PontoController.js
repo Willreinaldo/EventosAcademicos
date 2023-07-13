@@ -1,8 +1,14 @@
 const Ponto = require('../models/ponto');
-const driver = require('../database/neo4j');
+ 
+//BANCO DE DADOS NEO4J  - CONFIG
+const neo4j = require('neo4j-driver');
+const driver = neo4j.driver(
+  'neo4j://localhost:7687',
+  neo4j.auth.basic('neo4j', 'neo4j123456')
+);
 
 const addPonto = async (request, response) => {
-  const { nome, descricao, localizacao, dataInicio, dataTermino, usuarioId } = request.body;
+  const { nome, descricao, localizacao, dataInicio, dataTermino, geometria } = request.body;
 
   // Código para criar o evento no MongoDB
   const ponto = new Ponto({
@@ -11,32 +17,41 @@ const addPonto = async (request, response) => {
     localizacao,
     dataInicio,
     dataTermino,
+    geometria
   });
-
+  console.log("geometria:", geometria);
+  const { usuarioId } = geometria;
+  console.log("")
   try {
     await ponto.save();
     console.log('Evento salvo no MongoDB');
 
-    // Código para criar a relação no Neo4j
+    // Código para criar o nó do evento no Neo4j e relacioná-lo ao usuário
     const session = driver.session();
 
     try {
+      // Criação do nó do evento no Neo4j
       const result = await session.run(
-        'MATCH (u:Usuario {id: $usuarioId}), (e:Evento {id: $eventoId}) CREATE (u)-[:RELACIONADO]->(e)',
-        { usuarioId, eventoId: ponto._id.toString() }
+        'CREATE (e:Evento {id: $eventoId, nome: $nome})',
+        { eventoId: ponto._id.toString(), nome }
       );
+      console.log('Evento salvo no Neo4j', usuarioId);
 
+      const relacionamento = await session.run(
+        'MATCH (u:Usuario {id: $usuarioId}), (e:Evento {id: $eventoId}) CREATE (u)-[:PARTICIPA]->(e)',
+        { usuarioId: usuarioId, eventoId: ponto._id.toString() }
+      );
       console.log('Relacionamento criado com sucesso no Neo4j');
     } catch (error) {
-      console.error('Erro ao criar relacionamento no Neo4j:', error);
-      response.status(500).json({ error: 'Erro ao criar relacionamento no Neo4j' });
+      console.error('Erro ao criar evento ou relacionamento no Neo4j:', error);
+      response.status(500).json({ error: 'Erro ao criar evento ou relacionamento no Neo4j' });
       return;
     } finally {
       session.close();
       driver.close();
     }
 
-    response.status(200).send('Ponto salvo e relacionamento criado com sucesso');
+    response.status(200).send('Evento salvo e relacionamento criado com sucesso');
   } catch (err) {
     console.error(err);
     response.status(400).send('Falha ao salvar evento');
@@ -92,6 +107,7 @@ const buscarEventos = async (req, res) => {
     res.status(500).json({ message: 'Erro ao buscar eventos.' });
   }
 };
+
 const deletarPonto = async (request, response) => {
   const { id } = request.params;
   try {
@@ -134,4 +150,4 @@ const atualizarPonto = async (request, response) => {
   }
 };
 
-module.exports = { addPonto,buscarEventos, getPontos, buscarPonto, atualizarPonto, deletarPonto };
+module.exports = { addPonto, buscarEventos, getPontos, buscarPonto, atualizarPonto, deletarPonto };

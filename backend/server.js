@@ -19,14 +19,13 @@ const cors = require('cors');
 // Definir as rotas
 app.post('/pontos', addPonto);
 app.get('/pontos/buscar', buscarEventos);  
-app.get('/pontos/:id', buscarPonto);
-app.put('/pontos/:id',atualizarPonto);
-app.delete('/pontos/:id',deletarPonto);
+app.get('/pontos/:id',  buscarPonto);
+app.put('/pontos/:id', atualizarPonto);
+app.delete('/pontos/:id', deletarPonto);
 app.get('/pontos', getPontos);
-app.post('/usuarios/cadastrar', cadastrarUsuario);
+app.post('/usuarios/cadastrar',  cadastrarUsuario);
 app.post('/usuarios/login', realizarLogin); 
 app.get('/usuarios/usuario',verificarToken, buscarUsuarioLogado); 
-app.post('/usuarios/associarEvento', associarEventoUsuario);
 
 
 // Inicia o servidor

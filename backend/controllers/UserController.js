@@ -1,20 +1,35 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+//BANCO DE DADOS NEO4J  - CONFIG
+const neo4j = require('neo4j-driver');
+const driver = neo4j.driver(
+  'neo4j://localhost:7687',
+  neo4j.auth.basic('neo4j', 'neo4j123456')
+);
+
+
 const gerarToken = (usuarioId) => {
-  const token = jwt.sign({ id: usuarioId }, 'chave_secreta', { expiresIn: '1h' });
+  const token = jwt.sign({ id: usuarioId }, 'chave_secreta');
+  console.log("token gerado", token);
   return token;
 };
 
 const verificarToken = (req, res, next) => {
-  const token = req.headers.authorization;
+  const tokenWithBearer = req.headers.authorization;
 
+  if (tokenWithBearer == null) return res.sendStatus(401)
+
+  const token = tokenWithBearer.replace('Bearer', '');
+
+  console.log("token recebido da req do localstorage", token);
   if (!token) {
     return res.status(401).json({ error: 'Token não fornecido' });
   }
 
   jwt.verify(token, 'chave_secreta', (err, decoded) => {
     if (err) {
+      console.log("ERRO NO TOKEN: ", err);
       return res.status(403).json({ error: 'Token inválido' });
     }
 
@@ -27,7 +42,6 @@ const buscarUsuarioLogado = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
 
-    // Faça a lógica necessária para buscar os dados do usuário com base no usuarioId
     const usuario = await User.findById(usuarioId);
 
     // Verifique se o usuário foi encontrado
@@ -47,17 +61,49 @@ const cadastrarUsuario = async (req, res) => {
   const { nome, email, senha } = req.body;
 
   try {
+
     const usuarioExistente = await User.findOne({ email });
 
     if (usuarioExistente) {
-      return res.status(400).json({ error: 'E-mail já cadastrado' });
+      console.log("'E-mail já cadastrado' ");
+      return res.status(409).json({ error: 'E-mail já cadastrado!' });
     }
 
-    const novoUsuario = new User({ nome, email, senha });
-    await novoUsuario.save();
+    let novoUsuario;
 
-    res.status(201).json({ message: 'Usuário cadastrado com sucesso' });
+    try {
+      novoUsuario = new User({ nome, email, senha });
+      await novoUsuario.save();
+
+      // Código para criar o nó no Neo4j
+      const session = driver.session();
+
+      try {
+        const result = await session.run(
+          'CREATE (u:Usuario {id: $usuarioId, nome: $nome})',
+          { usuarioId: novoUsuario._id.toString(), nome }
+        );
+
+        result.records.forEach((record) => {
+          const nome = record.get('u.nome');
+          console.log(nome);
+        });
+
+        console.log('Nó de usuário criado com sucesso no Neo4j');
+      } catch (error) {
+        console.error('Erro ao criar nó de usuário no Neo4j:', error);
+        return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+      } finally {
+        session.close();
+      }
+
+      res.status(201).json({ message: 'Usuário cadastrado com sucesso' });
+    } catch (error) {
+      console.error("error from CREATE ON MONGO DB: ", error);
+      return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
+    }
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao cadastrar usuário' });
   }
 };
@@ -87,22 +133,9 @@ const realizarLogin = async (req, res) => {
   }
 };
 
-const associarEventoUsuario = async (req, res) => {
-  const { usuarioId, eventoId } = req.body;
-
-  try {
-    await criarRelacaoEventoUsuario(usuarioId, eventoId);
-
-    res.status(200).json({ message: 'Relacionamento criado com sucesso no Neo4j' });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao criar relacionamento no Neo4j' });
-  }
-};
-
 module.exports = {
   cadastrarUsuario,
   realizarLogin,
   verificarToken,
-  associarEventoUsuario,
   buscarUsuarioLogado
 };

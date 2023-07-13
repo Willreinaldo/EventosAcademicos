@@ -22,7 +22,7 @@ const Login = () => {
         const token = data.token; 
        localStorage.setItem('token', token);
 
-        console.log('Login realizado com sucesso!'); // Exibe mensagem de sucesso
+        console.log('Login realizado com sucesso!'); 
         window.alert("Login realizado com sucesso!");
         setEmail('');
         setSenha('');
@@ -33,7 +33,7 @@ const Login = () => {
         window.alert("Erro no login!");
       }
     } catch (error) {
-      console.error(error); // Exibe mensagem de erro genérico
+      console.error(error);  
       window.alert("Erro no login!");
     }
   };

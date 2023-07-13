@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
- import "bulma/css/bulma.css";
- 
-const Formulario = ({ markerPosition, localizacao }) => {
+import "bulma/css/bulma.css";
+
+const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
+  
   const today = new Date();
 
   const [nome, setNome] = useState("");
@@ -11,15 +12,20 @@ const Formulario = ({ markerPosition, localizacao }) => {
   const [dataTermino, setDataTermino] = useState(today);
   const navigate = useNavigate();
 
+
   const handleVerEventos = () => {
     navigate("/eventos");
   };
+  const handleLogout = () => {
+    navigate("/logout");
 
+  }
   const salvar = async () => {
     if (!nome) {
       alert("Nome não pode ser vazio.");
       return;
     }
+    console.log(usuarioId);
     const obj = {
       nome: nome,
       descricao: descricao,
@@ -29,9 +35,11 @@ const Formulario = ({ markerPosition, localizacao }) => {
       geometria: {
         type: 'Point',
         coordinates: [markerPosition.lng, markerPosition.lat],
+        usuario: usuarioId
       },
+      usuarioId: usuarioId
     };
-  
+
     try {
       const response = await fetch("http://localhost:4000/pontos", {
         method: "POST",
@@ -41,32 +49,13 @@ const Formulario = ({ markerPosition, localizacao }) => {
         },
         body: JSON.stringify(obj),
       });
-  
+
       if (response.ok) {
-        const data = await response.json();
         alert("Salvo com sucesso");
-  
-        const eventoId = data._id; 
-        const usuarioId = "123";
-        const neo4jResponse = await fetch("http://localhost:4000/associar-evento-usuario", {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ eventoId, usuarioId }),
-        });
-  
-        if (neo4jResponse.ok) {
-          console.log("Relacionamento criado com sucesso no Neo4j");
-        } else {
-          console.error("Erro ao criar relacionamento no Neo4j");
-        }
-      } else {
-        console.error("Falha ao salvar!");
       }
     } catch (error) {
-      console.error("Erro ao salvar:", error);
+      alert("Erro ao enviar evento", error);
+
     }
   };
   return (
@@ -75,6 +64,12 @@ const Formulario = ({ markerPosition, localizacao }) => {
       className="column is-half"
       style={{ justifyContent: "center", margin: "0 auto", marginTop: "1em" }}
     >
+      <h5 className="title is-5">Bem-vindo, {usuario}!</h5>
+      <button onClick={handleLogout}
+        className="button is-small is-white has-text-black is-underlined">
+        Sair!</button>
+
+        
       <h1 className="title is-3">Inserir Evento</h1>
       <form action="/eventos" method="POST">
         <div className="field">
@@ -125,38 +120,38 @@ const Formulario = ({ markerPosition, localizacao }) => {
           </div>
         </div>
 
-        <div> 
-        <label htmlFor="dataInicio" className="label">
-          Data de Início:
-        </label>
-        <div className="control">
-          <input
-            type="date"
-            id="dataInicio"
-            name="dataInicio"
-            value={dataInicio}
-            onChange={(event) => setDataInicio(event.target.value)}
-            className="input"
-            required
-          />
-        </div>
+        <div>
+          <label htmlFor="dataInicio" className="label">
+            Data de Início:
+          </label>
+          <div className="control">
+            <input
+              type="date"
+              id="dataInicio"
+              name="dataInicio"
+              value={dataInicio}
+              onChange={(event) => setDataInicio(event.target.value)}
+              className="input"
+              required
+            />
+          </div>
 
-        <label htmlFor="dataTermino" className="label">
-          Data de Término:
-        </label>
-        <div className="control">
-          <input
-            type="date"
-            id="dataTermino"
-            name="dataTermino"
-            value={dataTermino}
-            onChange={(event) => setDataTermino(event.target.value)}
-            className="input"
-            required
-          />
+          <label htmlFor="dataTermino" className="label">
+            Data de Término:
+          </label>
+          <div className="control">
+            <input
+              type="date"
+              id="dataTermino"
+              name="dataTermino"
+              value={dataTermino}
+              onChange={(event) => setDataTermino(event.target.value)}
+              className="input"
+              required
+            />
+          </div>
         </div>
-        </div>
-      <br></br>
+        <br></br>
 
         <div className="field is-grouped">
           <div className="control">
