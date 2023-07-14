@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('../backend/database/database');
-const {addPonto, getPontos, atualizarPonto, buscarPonto, deletarPonto, buscarEventos, getPontosAll} = require('../backend/controllers/PontoController.js');
+const {addPonto, getPontos, atualizarPonto, buscarPonto,
+   deletarPonto, buscarEventos, getPontosAll, 
+   getInscritos,inscreverUsuario} = require('../backend/controllers/PontoController.js');
+
 const { cadastrarUsuario, realizarLogin, logout, buscarUsuarioLogado, verificarToken } = require('../backend/controllers/UserController.js');
 
 const cors = require('cors');
@@ -29,7 +32,8 @@ app.post('/usuarios/cadastrar',  cadastrarUsuario);
 app.post('/usuarios/login', realizarLogin); 
 app.get('/usuarios/usuario',verificarToken, buscarUsuarioLogado); 
 app.post('/usuarios/logout',logout);
-
+app.post('/inscrever/:id',inscreverUsuario)
+app.get('/inscritos/:id',getInscritos)
 // Inicia o servidor
 const port = 4000;
 app.listen(port, async () => {

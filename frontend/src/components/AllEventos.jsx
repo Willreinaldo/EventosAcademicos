@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const dayjs = require('dayjs');
 
@@ -8,6 +9,7 @@ const AllEventos = (props) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredEventos, setFilteredEventos] = useState([]);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const verNoMapa = (localizacao) => {
         const { longitude, latitude } = localizacao;
@@ -112,6 +114,37 @@ const AllEventos = (props) => {
             console.error(error);
         }
     };
+    const handleInscricao = async (eventoId) => {
+        try {
+            console.log("eventoId:",eventoId);
+            console.log("usuarioId:",props.usuarioId);
+            await axios.post(`http://localhost:4000/inscrever/${eventoId}`,
+                { usuarioId: props.usuarioId });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const handleVerInscritos = async (eventoId) => {
+        try {
+          const response = await axios.get(`http://localhost:4000/inscritos/${eventoId}`);
+        console.log(response);
+          const data= await response.data;
+          exibirInscritos(data);
+        } catch (error) {
+          console.error('Erro ao obter inscritos:', error);
+        }
+      };
+      const exibirInscritos = (data) => {
+        const inscritosList = document.querySelector('.inscritos-list');
+      
+        inscritosList.innerHTML = '';
+      
+        data.forEach((inscrito) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = inscrito.nome;
+          inscritosList.appendChild(listItem);
+        });
+      };
 
     return (
         <div>
@@ -175,18 +208,18 @@ const AllEventos = (props) => {
                                             className="input is-size-7"
                                             disabled
                                         />
-                                        <Link
+                                        <button
                                             className="button is-small is-success"
-                                            to={`/inscrever/${evento._id}`}
+                                            onClick={() => handleInscricao(evento._id)}
                                         >
                                             Inscreva-se
-                                        </Link>
-                                        <Link
+                                        </button>
+                                        <button
                                             className="button is-small is-success"
-                                            to={`/inscrever/${evento._id}`}
+                                            onClick={() => handleVerInscritos(evento._id)}
                                         >
                                             Ver inscritos
-                                        </Link>
+                                        </button>
                                         <div className="column is-narrow">
                                             <button
                                                 className="button is-small"
@@ -218,7 +251,7 @@ const AllEventos = (props) => {
                                                 </span>
                                                 Deletar
                                             </button>
-
+                                        <div className="inscritos-list"></div>
                                         </div>
                                     </div>
                                 </div>

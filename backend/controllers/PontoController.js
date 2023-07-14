@@ -196,4 +196,54 @@ const atualizarPonto = async (request, response) => {
   }
 };
 
-module.exports = { addPonto, buscarEventos, getPontos, buscarPonto, getPontosAll, atualizarPonto, deletarPonto };
+const inscreverUsuario = async (req, res) => {
+  const { usuarioId } = req.body;
+  const eventoId = req.params.id;
+
+  console.log(usuarioId);
+  console.log(eventoId);
+    const session = driver.session();
+
+  try {
+    const result = await session.run(
+      'MATCH (u:Usuario {id: $usuarioId}), (e:Evento {id: $eventoId}) CREATE (u)-[:INSCREVEU]->(e)',
+      { usuarioId, eventoId }
+    );
+    console.log('Usuário inscrito com sucesso');
+    res.status(200).send('Usuário inscrito com sucesso');
+  } catch (error) {
+    console.error('Erro ao inscrever usuário:', error);
+    res.status(500).json({ error: 'Erro ao inscrever usuário' });
+  } finally {
+    session.close();
+  }
+};
+
+const getInscritos = async (req, res) => {
+  const  eventoId  = req.params.id;
+  
+  const session = driver.session();
+  try {
+    const result = await session.run(
+      'MATCH (u:Usuario)-[:INSCREVEU]->(e:Evento {id: $eventoId}) RETURN u',
+      { eventoId }
+    );
+
+    const inscritos = result.records.map(record => record.get('u').properties);
+    console.log("Inscritos enviados com sucesso!", inscritos);
+    res.json(inscritos);
+  } catch (error) {
+    console.error('Erro ao buscar inscritos:', error);
+    res.status(500).json({ error: 'Erro ao buscar inscritos' });
+  } finally {
+    session.close();
+  }
+};
+
+
+module.exports = { addPonto, 
+  buscarEventos, getPontos, 
+  buscarPonto, getPontosAll, 
+  atualizarPonto, deletarPonto,
+  getInscritos,inscreverUsuario
+};
