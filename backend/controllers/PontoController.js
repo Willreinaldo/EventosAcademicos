@@ -4,7 +4,7 @@ const driver = require('../database/neo4j');
 
 
 const addPonto = async (request, response) => {
-  const { nome, descricao, localizacao, dataInicio, dataTermino, geometria } = request.body;
+  const { nome, descricao, localizacao, dataInicio, dataTermino, geometria, usuarioNome } = request.body;
 
   // Código para criar o evento no MongoDB
   const ponto = new Ponto({
@@ -13,7 +13,8 @@ const addPonto = async (request, response) => {
     localizacao,
     dataInicio,
     dataTermino,
-    geometria
+    geometria,
+    usuarioNome
   });
   console.log("geometria:", geometria);
   const { usuario } = geometria;
@@ -54,9 +55,11 @@ const addPonto = async (request, response) => {
   }
 }; 
 
+
 const getPontosAll = async (request, response) => {
   try {
-    const pontos = await Ponto.find();
+    const userId = request.query.userId;
+    const pontos = await Ponto.find({ "geometria.usuario": { $ne: userId } });
     response.status(200).send(pontos);
   } catch (err) {
     console.error(err);
@@ -193,4 +196,4 @@ const atualizarPonto = async (request, response) => {
   }
 };
 
-module.exports = { addPonto, buscarEventos, getPontos, buscarPonto, atualizarPonto, deletarPonto };
+module.exports = { addPonto, buscarEventos, getPontos, buscarPonto, getPontosAll, atualizarPonto, deletarPonto };

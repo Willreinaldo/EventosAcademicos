@@ -19,6 +19,11 @@ const pontoSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  usuarioNome: {
+    type: String,
+    text: true
+    
+  },
   geometria: {
     type: {
       type: String,
@@ -34,6 +39,7 @@ const pontoSchema = new mongoose.Schema({
       ref: 'User',
       required: true,
     },
+    
   },
 });
 

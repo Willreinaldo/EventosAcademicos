@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('../backend/database/database');
-const {addPonto, getPontos, atualizarPonto, buscarPonto, deletarPonto, buscarEventos } = require('../backend/controllers/PontoController.js');
+const {addPonto, getPontos, atualizarPonto, buscarPonto, deletarPonto, buscarEventos, getPontosAll} = require('../backend/controllers/PontoController.js');
 const { cadastrarUsuario, realizarLogin, logout, buscarUsuarioLogado, verificarToken } = require('../backend/controllers/UserController.js');
 
 const cors = require('cors');
@@ -23,6 +23,8 @@ app.get('/pontos/:id',  buscarPonto);
 app.put('/pontos/:id', atualizarPonto);
 app.delete('/pontos/:id', deletarPonto);
 app.get('/pontos', getPontos);
+app.get('/pontosTodos', getPontosAll);
+
 app.post('/usuarios/cadastrar',  cadastrarUsuario);
 app.post('/usuarios/login', realizarLogin); 
 app.get('/usuarios/usuario',verificarToken, buscarUsuarioLogado); 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Eventos from './components/Eventos';
+import AllEventos from './components/AllEventos'
 import Cadastro from './components/User/Cadastro';
 import Login from './components/User/Login';
 import LogoutPage from './components/User/Logout';
@@ -61,10 +62,18 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="/AllEventos"
+          element={
+            <PrivateRoute>
+              <AllEventos usuarioId={usuarioId} nomeUsuario={nomeUsuario} />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/eventos/:id"
           element={
             <PrivateRoute>
-              <EditarEvento usuarioId={usuarioId} nomeUsuario={nomeUsuario}/>
+              <EditarEvento usuarioId={usuarioId} nomeUsuario={nomeUsuario} />
             </PrivateRoute>
           }
         />

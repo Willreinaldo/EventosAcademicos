@@ -17,6 +17,9 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
   const handleVerEventos = () => {
     navigate("/eventos");
   };
+  const handleSeInscreverEventos = () => {
+    navigate("/AllEventos");
+  };
   const handleLogout = () => {
     navigate("/logout");
 
@@ -28,7 +31,6 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
     }
     setLoading(true);  
 
-    console.log(usuarioId);
     const obj = {
       nome: nome,
       descricao: descricao,
@@ -40,7 +42,8 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
         coordinates: [markerPosition.lng, markerPosition.lat],
         usuario: usuarioId
       },
-      usuarioId: usuarioId
+      usuarioId: usuarioId,
+      usuarioNome: usuario
     };
 
     try {
@@ -176,7 +179,14 @@ const Formulario = ({ markerPosition, localizacao, usuario, usuarioId }) => {
               onClick={handleVerEventos}
               className="button is-text"
             >
-              Ver eventos
+              Ver meus eventos
+            </button>
+            <button
+              type="button"
+              onClick={handleSeInscreverEventos}
+              className="button is-text"
+            >
+              Se inscrever em um evento
             </button>
           </div>
         </div>
