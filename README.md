@@ -1,7 +1,9 @@
 # Persistência de Eventos por Localização
 Este projeto é responsável por persistir eventos acadêmicos em um banco de dados com base na sua localização geográfica e listar esses eventos em outra página, além de editar e excluir o evento.
-
-O projeto utiliza JavaScript, React,DayJS Bulma.css e a API do Google Maps  no frontend, Express.js, Mongoose, Axios no backend, e MongoDB como banco de dados noSQL. O projeto não foi feito com docker. 
+Este é um projeto que utiliza persistência poliglota com MongoDB e Neo4J. O Neo4J é utilizado para fazer as relações entre eventos e usuários.
+O projeto utiliza JavaScript, React,DayJS Bulma.css e a API do Google Maps  no frontend,
+Express.js, neo4j-driver, Mongoose, Axios no backend,
+e MongoDB como banco de dados noSQL e o Neo4j via Docker. 
 
 ## Pré-requisitos
 Para executar o projeto localmente, você precisará ter o seguinte software instalado:
@@ -19,7 +21,7 @@ MONGO_USER=<nome_do_user_do_banco_de_dados>
 MONGO_PASSWORD=<sennha_do_banco_de_dados>
 ATLAS_HOST=<host_do_banco_de_dados>
 ``` 
-* Certifique-se de que o MongoDB esteja em execução em sua máquina local.
+* Certifique-se de que o MongoDB e o Neo4j esteja em execução em sua máquina local.
 Execute o comando npm run start para iniciar o servidor backend. O servidor será executado na porta 4000.
 
 ### Frontend</h3>
